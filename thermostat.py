@@ -15,24 +15,20 @@ class Thermostat:
         path = "query/info"
         return self.handler.request(path)
 
-    # def query_sensors(self):
-    #     path = "query/sensors"
-    #     return request_handler.request(self.generate_url(path))
+    def query_sensors(self):
+        path = "query/sensors"
+        return self.handler.request(path)
 
-    # def query_alerts(self):
-    #     path = "query/alerts"
-    #     return request_handler.request(self.generate_url(path))
+    def query_alerts(self):
+        path = "query/alerts"
+        return self.handler.request(path)
 
-    # def query_runtimes(self):
-    #     path = "query/runtimes"
-    #     return request_handler.request(self.generate_url(path))
+    def query_runtimes(self):
+        path = "query/runtimes"
+        return self.handler.request(path)
 
-
-
-# def response(url):
-#     with urllib.request.urlopen(url) as response:
-#         return response.read()
-
-
-# data = response(url)
-# print(json.loads(data))
+    def set_cool_temp(self, cool_temp):
+        path = "control"
+        method = "POST"
+        data = {"cooltemp": cool_temp}
+        return self.handler.request(path, method, data)
