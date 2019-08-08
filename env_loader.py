@@ -54,3 +54,4 @@ def load_config():
     }
 
     return config
+    
