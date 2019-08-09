@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-# import json
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# griddy.py
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 from request_handler import RequestHandler
+
 
 address = "app.gogriddy.com"
 path = "/api/v1/insights/getnow"
+
 
 class Griddy:
 
@@ -23,4 +28,3 @@ class Griddy:
 
     def get_current_status(self):
         return self.data["now"]
-    

@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# thermostat.py
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
 from request_handler import RequestHandler
+
 
 class Thermostat:
 
