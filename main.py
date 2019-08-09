@@ -13,7 +13,7 @@ import time
 
 
 POLL_FREQUENCY = 150
-COOL_TEMP = 80
+COOL_TEMP = 79
 HEAT_TEMP = 62
 MAX_CENTS_PER_KWH = 5.0
 
@@ -23,6 +23,8 @@ g = griddy.Griddy(config["griddy"])
 
 
 def write_log(log_data):
+    print(log_data)
+
     timestamp = str(datetime.datetime.now())
     log_line = "{} - {}".format(timestamp, log_data)
 
@@ -36,15 +38,19 @@ def price_is_high(current_price):
 
 def main():
 
+    write_log("Thermostat monitor started.")
+
     spike = False
+
     while True:
-        # g.query()
+        g.query()
         griddy_data = g.get_current_status()
         current_price = griddy_data["price_ckwh"]
 
         thermo_data = t.query_states()
         space_temp = thermo_data["spacetemp"]
         
+        # Price is high, so check if thermostat needs to be adjusted.
         if price_is_high(current_price):
 
             spike = True
@@ -53,30 +59,39 @@ def main():
             if thermo_data["state"] == 2:
                 t.set_cool_temp(space_temp + 2)
 
-                log_line = "space temp: {}, cool temp: {}, current price: {}".format(
-                    space_temp,
-                    thermo_data["cooltemp"],
-                    current_price
+                write_log(
+                    "Spike detected. [space temp: {}, cool temp: {}, current price: {}]".format(
+                        space_temp,
+                        thermo_data["cooltemp"],
+                        current_price
+                    )
                 )
 
-                write_log(log_line)
+                new_cool_temp = space_temp + 2
+
+                write_log("Setting cool temp to {}".format(new_cool_temp))
+
+                t.set_cool_temp(new_cool_temp)
+
         else:
+
+            # Price is not high, so maintain current temperature programming.
             t.set_cool_temp(COOL_TEMP)
 
+            # Unflag an existing spike.
             if spike is True:
-                log_line = "Spike ended; resuming program."
-                write_log(log_line)
-
-                log_line = "space temp: {}, cool temp: {}, current price: {}".format(
-                    space_temp,
-                    thermo_data["cooltemp"],
-                    current_price
-                )
-
-                write_log(log_line)
 
                 spike = False
 
+                write_log(
+                    "Spike ended. [space temp: {}, cool temp: {}, current price: {}]".format(
+                        space_temp,
+                        thermo_data["cooltemp"],
+                        current_price
+                    )
+                )
+
+                write_log("Resuming program; cool temp set to {}".format(COOL_TEMP))
 
         time.sleep(POLL_FREQUENCY)
 
