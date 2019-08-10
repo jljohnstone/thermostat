@@ -75,6 +75,8 @@ def state_logger():
             else:
                 write_log("Thermostat state set to error.")
 
+        time.sleep(60)
+
 
 def main():
     write_log("Thermostat monitor started.")
