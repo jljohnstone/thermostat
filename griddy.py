@@ -12,17 +12,19 @@ path = "/api/v1/insights/getnow"
 
 class Griddy:
 
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, meter_id, member_id, settlement_point):
+        self.meter_id = meter_id
+        self.member_id = member_id
+        self.settlement_point = settlement_point
         self.handler = RequestHandler(address)
         self.handler.set_ssl(True)
         self.data = None
 
     def query(self):
         json = {
-            "meterid": self.config["meter_id"],
-            "memberid": self.config["member_id"],
-            "settlement_point": self.config["settlement_point"]
+            "meterid": self.meter_id,
+            "memberid": self.member_id,
+            "settlement_point": self.settlement_point
         }
         self.data = self.handler.json_request(path, json)
 
