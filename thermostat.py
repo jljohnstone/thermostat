@@ -9,15 +9,14 @@ from request_handler import RequestHandler
 
 class Thermostat:
 
-    def __init__(self, config):
-        self.config = config
-        self.handler = RequestHandler(config["address"])
+    def __init__(self, ip_address):
+        self.handler = RequestHandler(ip_address)
 
     # Call this method to use HTTPS on the endpoint.
     def use_ssl(self):
         self.handler.set_ssl(True)
 
-    def query_states(self):
+    def query_info(self):
         path = "query/info"
         return self.handler.request(path)
 
