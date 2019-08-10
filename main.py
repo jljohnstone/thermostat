@@ -18,8 +18,12 @@ HEAT_TEMP = 62
 MAX_CENTS_PER_KWH = 5.0
 
 config = env_loader.load_config()
-t = Thermostat(config["thermostat"])
-g = griddy.Griddy(config["griddy"])
+t = Thermostat(config["thermostat"]["address"])
+g = griddy.Griddy(
+    config["griddy"]["meter_id"],
+    config["griddy"]["member_id"],
+    config["griddy"]["settlement_point"]
+)
 
 
 def write_log(log_data):
@@ -36,8 +40,43 @@ def price_is_high(current_price):
     return float(current_price) > float(MAX_CENTS_PER_KWH)
 
 
-def main():
+def state_logger():
+    is_active = False
 
+    while True:
+        info = t.query_info()
+
+        # Venstar API: 
+        #   0 = idle
+        #   1 = heating
+        #   2 = cooling
+        #   3 = lockout
+        #   4 = error
+        if info["state"] == 0:
+            
+            if is_active: 
+                is_active = False
+                write_log("Thermostat state set to idle.")
+
+        elif info["state"] == 1 or info["state"] == 2:
+
+            if not is_active:
+                is_active = True
+
+                if info["state"] == 1:
+                    write_log("Thermostat state set to heating.")
+                else:
+                    write_log("Thermostat state set to cooling.")
+
+        elif info["state"] == 3 or info["state"] == 4:
+
+            if info["state"] == 3:
+                write_log("Thermostat state set to lockout.")
+            else:
+                write_log("Thermostat state set to error.")
+
+
+def main():
     write_log("Thermostat monitor started.")
 
     spike = False
@@ -47,7 +86,7 @@ def main():
         griddy_data = g.get_current_status()
         current_price = griddy_data["price_ckwh"]
 
-        thermo_data = t.query_states()
+        thermo_data = t.query_info()
         space_temp = thermo_data["spacetemp"]
         
         # Price is high, so check if thermostat needs to be adjusted.
@@ -97,6 +136,9 @@ def main():
 
 
 if __name__ == "__main__":
-    p = Process(target = main)
-    p.start()
-    p.join()
+    m = Process(target = main)
+    s = Process(target = state_logger)
+    m.start()
+    s.start()
+    m.join()
+    s.join()
