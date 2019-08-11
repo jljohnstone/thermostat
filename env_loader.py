@@ -8,54 +8,58 @@ import os
 import sys
 
 
+class ENVLoaderException(Exception):
+    def __init__(self, message):
+        self.message = "ENVLoaderException: {}".format(message)
+
+
 def load_config():
-    thermostat_address = None
-    griddy_meter_id = None
-    griddy_member_id = None
-    griddy_settlement_point = None
+
+    # Set a list of expected ENV keys.
+    required_envs = [
+        "thermostat_address",
+        "griddy_meter_id",
+        "griddy_member_id",
+        "griddy_settlement_point"
+    ]
+
+    raw_config = {}
 
     try:
-        thermostat_address = os.environ["THERMOSTAT_ADDRESS"]
-        griddy_meter_id = os.environ["GRIDDY_METER_ID"]
-        griddy_member_id = os.environ["GRIDDY_MEMBER_ID"]
-        griddy_settlement_point = os.environ["GRIDDY_SETTLEMENT_POINT"]
+        with open("./.env.local", "r") as f:
+            lines = f.readlines()
 
-    except:
-        print("ENVs not set. Attempting to load from dotenv file.")
+        # Convert the ENV file lines to key-value entries.
+        found = 0;
+        lines = [x.strip().split('=') for x in lines if '=' in x]
+        for line in lines:
+            key = line[0].lower()
+            raw_config[key] = line[1]
 
-        try:
-            with open("./.env.local", "r") as f:
-                lines = f.readlines()
+            # Track expected key matches.
+            if key in required_envs and line[1] != "":
+                found += 1
 
-            lines = [x.strip().split('=') for x in lines if '=' in x]
+        if found != len(required_envs):
+            raise ENVLoaderException("A required environment variable is missing or not set.") 
 
-            for line in lines:
-                if line[0] == "THERMOSTAT_ADDRESS":
-                    thermostat_address = line[1]
+    except ENVLoaderException as e:
+        print(e)
+        sys.exit(1)
 
-                if line[0] == "GRIDDY_METER_ID":
-                    griddy_meter_id = line[1]
-
-                if line[0] == "GRIDDY_MEMBER_ID":
-                    griddy_member_id = line[1]
-
-                if line[0] == "GRIDDY_SETTLEMENT_POINT":
-                    griddy_settlement_point = line[1]
-            
-        except:
-            print("Failed to load environment variables. Exiting")
-            sys.exit(1)
+    except Exception:
+        print("Unable to load and process the ENV file.")
+        sys.exit(1)
 
     config = {
         "thermostat": {
-            "address": thermostat_address
+            "address": raw_config["thermostat_address"]
         },
         "griddy": {
-            "meter_id": griddy_meter_id,
-            "member_id": griddy_member_id,
-            "settlement_point": griddy_settlement_point
+            "meter_id": raw_config["griddy_meter_id"],
+            "member_id": raw_config["griddy_member_id"],
+            "settlement_point": raw_config["griddy_settlement_point"]
         }
     }
 
     return config
-    
