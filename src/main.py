@@ -17,6 +17,7 @@ COOL_TEMP = 78
 HEAT_TEMP = 62
 MAX_CENTS_PER_KWH = 5.0
 
+
 config = env_loader.load_config()
 t = Thermostat(config["thermostat"]["address"])
 g = griddy.Griddy(
