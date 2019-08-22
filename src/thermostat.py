@@ -10,30 +10,37 @@ from request_handler import RequestHandler
 class Thermostat:
 
     def __init__(self, ip_address):
-        self.handler = RequestHandler(ip_address)
+        self.ip_address = ip_address
 
-    # Call this method to use HTTPS on the endpoint.
-    def use_ssl(self):
-        self.handler.set_ssl(True)
+    def get_handler(self):
+        handler = RequestHandler()
+        handler.set_server(self.ip_address)
+        handler.use_ssl = False
+        return handler
 
     def query_info(self):
-        path = "query/info"
-        return self.handler.request(path)
+        handler = self.get_handler()
+        handler.set_path("query/info")
+        return handler.send_request()
 
     def query_sensors(self):
-        path = "query/sensors"
-        return self.handler.request(path)
+        handler = self.get_handler()
+        handler.set_path("query/info")
+        return handler.send_request()
 
     def query_alerts(self):
-        path = "query/alerts"
-        return self.handler.request(path)
+        handler = self.get_handler()
+        handler.set_path("query/alerts")
+        return handler.send_request()
 
     def query_runtimes(self):
-        path = "query/runtimes"
-        return self.handler.request(path)
+        handler = self.get_handler()
+        handler.set_path("query/runtimes")
+        return handler.send_request()
 
     def set_cool_temp(self, cool_temp):
-        path = "control"
-        method = "POST"
+        handler = self.get_handler()
         data = {"cooltemp": cool_temp}
-        return self.handler.request(path, method, data)
+        handler.set_path("control")
+        handler.set_data(data)
+        return handler.send_request("POST")
