@@ -8,7 +8,7 @@ from thermostat import Thermostat
 import datetime
 import env_loader
 import griddy
-import logging
+import logger
 import time
 
 
@@ -27,16 +27,6 @@ g = griddy.Griddy(
 )
 
 
-def write_log(log_data):
-    print(log_data)
-
-    timestamp = str(datetime.datetime.now())
-    log_line = "{} - {}".format(timestamp, log_data)
-
-    logging.basicConfig(filename='./thermostat.log',level=logging.DEBUG)
-    logging.info(log_line)
-
-
 def price_is_high(current_price):
     return float(current_price) > float(MAX_CENTS_PER_KWH)
 
@@ -46,94 +36,69 @@ def state_logger():
 
     while True:
         info = t.query_info()
-
-        # Venstar API: 
-        #   0 = idle
-        #   1 = heating
-        #   2 = cooling
-        #   3 = lockout
-        #   4 = error
-        if info["state"] == 0:
-            
-            if is_active: 
-                is_active = False
-                write_log("Thermostat state set to idle.")
-
-        elif info["state"] == 1 or info["state"] == 2:
-
-            if not is_active:
-                is_active = True
-
-                if info["state"] == 1:
-                    write_log("Thermostat state set to heating.")
-                else:
-                    write_log("Thermostat state set to cooling.")
-
-        elif info["state"] == 3 or info["state"] == 4:
-
-            if info["state"] == 3:
-                write_log("Thermostat state set to lockout.")
-            else:
-                write_log("Thermostat state set to error.")
-
+        is_active = logger.log_thermostat_state(info["state"], is_active)
         time.sleep(60)
 
 
-def main():
-    write_log("Thermostat monitor started.")
+def spike_handler(thermo_data, current_price, spike_status):
+    thermostat_state = thermo_data["state"] 
+    space_temp = thermo_data["spacetemp"]
+    temp_delta = 2
+    cool_temp = thermo_data["cooltemp"]
 
-    spike = False
+    # Price is high, so check if thermostat needs to be adjusted.
+    if price_is_high(current_price):
+
+        # Venstar API: 2 = cooling state
+        if thermostat_state == 2:
+
+            logger.write_log(
+                "Spike detected. [space temp: {}, cool temp: {}, current price: {}]".format(
+                    space_temp,
+                    cooltemp,
+                    current_price
+                )
+            )
+
+            new_cool_temp = space_temp + temp_delta
+            t.set_cool_temp(new_cool_temp)
+            logger.write_log("Setting cool temp to {}".format(new_cool_temp))
+
+            return True
+
+    else:
+
+        # Price is not high, so maintain current temperature programming.
+        t.set_cool_temp(COOL_TEMP)
+
+        # Unflag an existing spike.
+        if spike_status is True:
+
+            logger.write_log(
+                "Spike ended. [space temp: {}, cool temp: {}, current price: {}]".format(
+                    space_temp,
+                    cooltemp,
+                    current_price
+                )
+            )
+
+            logger.write_log("Resuming program; cool temp set to {}".format(COOL_TEMP))
+
+            return False
+
+
+def main():
+    logger.write_log("Thermostat monitor started.")
+
+    spike_status = False
 
     while True:
         g.query()
         griddy_data = g.get_current_status()
         current_price = griddy_data["price_ckwh"]
-
         thermo_data = t.query_info()
-        space_temp = thermo_data["spacetemp"]
         
-        # Price is high, so check if thermostat needs to be adjusted.
-        if price_is_high(current_price):
-
-            spike = True
-
-            # Venstar API: 2 = cooling state
-            if thermo_data["state"] == 2:
-                t.set_cool_temp(space_temp + 2)
-
-                write_log(
-                    "Spike detected. [space temp: {}, cool temp: {}, current price: {}]".format(
-                        space_temp,
-                        thermo_data["cooltemp"],
-                        current_price
-                    )
-                )
-
-                new_cool_temp = space_temp + 2
-
-                write_log("Setting cool temp to {}".format(new_cool_temp))
-
-                t.set_cool_temp(new_cool_temp)
-
-        else:
-
-            # Price is not high, so maintain current temperature programming.
-            t.set_cool_temp(COOL_TEMP)
-
-            # Unflag an existing spike.
-            if spike is True:
-
-                spike = False
-
-                write_log(
-                    "Spike ended. [space temp: {}, cool temp: {}, current price: {}]".format(
-                        space_temp,
-                        thermo_data["cooltemp"],
-                        current_price
-                    )
-                )
-
-                write_log("Resuming program; cool temp set to {}".format(COOL_TEMP))
+        spike_status = spike_handler(thermo_data, current_price, spike_status)
 
         time.sleep(POLL_PROVIDER_FREQUENCY)
 
