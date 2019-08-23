@@ -55,7 +55,7 @@ def spike_handler(thermo_data, current_price, spike_status):
             logger.write_log(
                 "Spike detected. [space temp: {}, cool temp: {}, current price: {}]".format(
                     space_temp,
-                    cooltemp,
+                    cool_temp,
                     current_price
                 )
             )
@@ -77,7 +77,7 @@ def spike_handler(thermo_data, current_price, spike_status):
             logger.write_log(
                 "Spike ended. [space temp: {}, cool temp: {}, current price: {}]".format(
                     space_temp,
-                    cooltemp,
+                    cool_temp,
                     current_price
                 )
             )
