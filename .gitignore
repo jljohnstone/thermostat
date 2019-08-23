@@ -1,3 +1,19 @@
+# App configuration
 */.env.local
-__pycache__
 *.log
+
+
+# Cache
+__pycache__
+.pytest_cache
+
+
+# Packaging/distribution and environment
+bin/
+lib/
+lib64
+share/
+versions/
+*.egg-info/
+pyvenv.cfg
+.venv
