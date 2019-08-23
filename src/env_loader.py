@@ -13,7 +13,7 @@ class ENVLoaderException(Exception):
         self.message = "ENVLoaderException: {}".format(message)
 
 
-def load_config():
+def load_config(env_file):
 
     # Set a list of expected ENV keys.
     required_envs = [
@@ -26,7 +26,7 @@ def load_config():
     raw_config = {}
 
     try:
-        with open("./.env.local", "r") as f:
+        with open(env_file, "r") as f:
             lines = f.readlines()
 
         # Convert the ENV file lines to key-value entries.

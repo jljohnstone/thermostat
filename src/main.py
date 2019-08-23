@@ -16,9 +16,10 @@ POLL_PROVIDER_FREQUENCY = 150
 COOL_TEMP = 78
 HEAT_TEMP = 62
 MAX_CENTS_PER_KWH = 5.0
+ENV_FILE = "./.env.local"
 
 
-config = env_loader.load_config()
+config = env_loader.load_config(ENV_FILE)
 t = Thermostat(config["thermostat"]["address"])
 g = griddy.Griddy(
     config["griddy"]["meter_id"],
