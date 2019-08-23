@@ -1,5 +1,0 @@
-setup.py
-Thermostat_Manager.egg-info/PKG-INFO
-Thermostat_Manager.egg-info/SOURCES.txt
-Thermostat_Manager.egg-info/dependency_links.txt
-Thermostat_Manager.egg-info/top_level.txt
