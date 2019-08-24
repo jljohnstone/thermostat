@@ -31,8 +31,5 @@ class Griddy:
 
         self.data = handler.send_request()
 
-    def get_data(self):
-        return self.data
-
-    def get_current_status(self):
-        return self.data["now"]
+    def get_current_price(self):
+        return self.data["now"]["price_ckwh"]
