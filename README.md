@@ -13,7 +13,7 @@ This project is designed around the Venstar series of thermostats implementing a
 The following are required:
 
 - Griddy service
-- Venstar thermostat with WI-FI module and local API
+- Venstar thermostat with wi-fi module and local API
 - linux-based application host (e.g., Raspberry Pi running Raspbian OS)
 
 The application host should have network access to the Venstar device.
