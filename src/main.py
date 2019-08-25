@@ -10,7 +10,7 @@ import env_loader
 import griddy
 import logger
 import time
-import sys
+
 
 POLL_PROVIDER_FREQUENCY = 150
 COOL_TEMP = 78
@@ -96,9 +96,9 @@ def main():
     while True:
         g.query()
         current_price = g.get_current_price()
-        
+
         thermo_data = t.query_info()
-        
+
         spike_status = spike_handler(thermo_data, current_price, spike_status)
 
         time.sleep(POLL_PROVIDER_FREQUENCY)
