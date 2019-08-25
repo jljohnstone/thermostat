@@ -16,12 +16,12 @@ class ENVLoaderException(Exception):
 def load_config(env_file):
 
     # Set a list of expected ENV keys.
-    required_envs = [
+    required_envs = (
         "thermostat_address",
         "griddy_meter_id",
         "griddy_member_id",
         "griddy_settlement_point"
-    ]
+    )
 
     raw_config = {}
 
