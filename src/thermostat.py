@@ -13,34 +13,45 @@ class Thermostat:
         self.ip_address = ip_address
 
     def get_handler(self):
-        handler = RequestHandler()
-        handler.set_server(self.ip_address)
-        handler.use_ssl = False
-        return handler
+        return (
+            RequestHandler()
+            .set_protocol("http")
+            .set_server(self.ip_address)
+        )
 
     def query_info(self):
-        handler = self.get_handler()
-        handler.set_path("query/info")
-        return handler.send_request()
+        return (
+            self.get_handler()
+            .set_path("query/info")
+            .send_request()
+        )
 
     def query_sensors(self):
-        handler = self.get_handler()
-        handler.set_path("query/info")
-        return handler.send_request()
+        return (
+            self.get_handler()
+            .set_path("query/sensors")
+            .send_request()
+        )
 
     def query_alerts(self):
-        handler = self.get_handler()
-        handler.set_path("query/alerts")
-        return handler.send_request()
+        return (
+            self.get_handler()
+            .set_path("query/alerts")
+            .send_request()
+        )
 
     def query_runtimes(self):
-        handler = self.get_handler()
-        handler.set_path("query/runtimes")
-        return handler.send_request()
+        return (
+            self.get_handler()
+            .set_path("query/runtimes")
+            .send_request()
+        )
 
     def set_cool_temp(self, cool_temp):
-        handler = self.get_handler()
         data = {"cooltemp": cool_temp}
-        handler.set_path("control")
-        handler.set_data(data)
-        return handler.send_request("POST")
+        return (
+            self.get_handler()
+            .set_path("control")
+            .set_data(data)
+            .send_request("POST")
+        )
