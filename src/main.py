@@ -65,7 +65,7 @@ def spike_handler(thermo_data, current_price, spike_status):
             t.set_cool_temp(new_cool_temp)
             logger.write_log("Setting cool temp to {}".format(new_cool_temp))
 
-            return True
+            spike_status = True
 
     else:
 
@@ -85,7 +85,9 @@ def spike_handler(thermo_data, current_price, spike_status):
 
             logger.write_log("Resuming program; cool temp set to {}".format(COOL_TEMP))
 
-            return False
+            spike_status = False
+
+    return spike_status
 
 
 def main():
