@@ -20,21 +20,19 @@ ENV_FILE = "./.env.local"
 
 
 config = env_loader.load_config(ENV_FILE)
-t = Thermostat(config["thermostat"]["address"])
-g = griddy.Griddy(
-    config["griddy"]["meter_id"],
-    config["griddy"]["member_id"],
-    config["griddy"]["settlement_point"]
-)
+thermostat_address = config["thermostat"]["address"]
+meter_id = config["griddy"]["meter_id"]
+member_id = config["griddy"]["member_id"]
+settlement_point = config["griddy"]["settlement_point"]
 
 
 def price_is_high(current_price):
     return float(current_price) > float(MAX_CENTS_PER_KWH)
 
 
-def state_logger():
+def state_logger(t):
     is_active = False
-
+    
     while True:
         info = t.query_info()
         is_active = logger.log_thermostat_state(info["state"], is_active)
@@ -90,9 +88,8 @@ def spike_handler(thermo_data, current_price, spike_status):
     return spike_status
 
 
-def main():
+def main(t, g):
     logger.write_log("Thermostat monitor started.")
-
     spike_status = False
 
     while True:
@@ -107,8 +104,12 @@ def main():
 
 
 if __name__ == "__main__":
-    m = Process(target = main)
-    s = Process(target = state_logger)
+    t = Thermostat(thermostat_address)
+    g = griddy.Griddy(meter_id, member_id, settlement_point)
+
+    m = Process(target = main, args=(t, g))
+    s = Process(target = state_logger, args = (t,))
+
     m.start()
     s.start()
     m.join()
