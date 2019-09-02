@@ -12,7 +12,7 @@ import logger
 import time
 
 
-POLL_PROVIDER_FREQUENCY = 150
+POLL_FREQUENCY = 150
 COOL_TEMP = 78
 HEAT_TEMP = 62
 MAX_CENTS_PER_KWH = 5.0
@@ -100,7 +100,7 @@ def main(t, g):
 
         spike_status = spike_handler(thermo_data, current_price, spike_status)
 
-        time.sleep(POLL_PROVIDER_FREQUENCY)
+        time.sleep(POLL_FREQUENCY)
 
 
 if __name__ == "__main__":
