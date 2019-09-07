@@ -5,6 +5,7 @@
 # This installer sets up the thermostat monitor and creates a systemd entry.
 
 declare -r APP_DIRECTORY="/opt/thermostat_manager/"
+declare -r LOG_DIRECTORY="/opt/thermostat_manager/var/log/"
 declare -r SYSTEMD_TARGET="/etc/systemd/system/thermostat.service"
 
 
@@ -84,6 +85,13 @@ install() {
     mkdir -p ${APP_DIRECTORY}
     if [ $? -ne 0 ]; then
         printf "\nFailed to create application directory.\nExiting.\n\n"
+        exit 1
+    fi
+
+    printf "  * Creating log directory...\n"
+    mkdir -p ${LOG_DIRECTORY}
+    if [ $? -ne 0 ]; then
+        printf "\nFailed to create log directory.\nExiting.\n\n"
         exit 1
     fi
 
