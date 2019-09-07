@@ -1,6 +1,6 @@
 # App configuration
 */.env.local
-*.log
+*.log*
 
 
 # Cache
