@@ -14,7 +14,7 @@ import log_manager
 
 class Thermostat:
 
-    COOL_TEMP = 78
+    COOL_TEMP = 73
     HEAT_TEMP = 62
     DEFAULT_MODE = "auto"
 
@@ -81,7 +81,7 @@ class Thermostat:
 
         # Spike is active.
         if self.is_spike_active():
-            
+
             # Price protection is enabled.
             if self.is_price_protected():
                 self.logger.info(
