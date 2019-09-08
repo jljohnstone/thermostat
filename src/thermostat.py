@@ -14,8 +14,8 @@ import log_manager
 
 class Thermostat:
 
-    COOL_TEMP = 73
-    HEAT_TEMP = 62
+    COOL_TEMP = 23.5
+    HEAT_TEMP = 19.5
     DEFAULT_MODE = "auto"
 
     MODE_MAP = {
