@@ -1,7 +1,7 @@
 # App configuration
 */.env.local
 *.log*
-
+*.db
 
 # Cache
 __pycache__

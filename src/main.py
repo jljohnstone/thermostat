@@ -9,9 +9,14 @@ import env_loader
 import griddy
 import log_manager
 import time
+import sqlite3
 
+conn = sqlite3.connect('thermostat.db')
+db = conn.cursor()
+db.execute("SELECT poll_frequency FROM configuration;")
+row = db.fetchone()
 
-POLL_FREQUENCY = 150
+POLL_FREQUENCY = row[0]
 ENV_FILE = "./.env.local"
 
 
